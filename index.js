@@ -16,7 +16,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // Set the view engine
-
+app.set("view engine", "ejs")
 
 // Define the schema for a planet called planetSchema
 // Add the following attributes
@@ -26,12 +26,19 @@ app.use(express.json());
 // imagePath (string)
 // description (string)
 // orbital (number)
-
+const planetSchema = new mongoose.Schema({
+  name: { type: String, required: true, unique: true },
+  distance:{ type: Number, required: true },
+  imagePath:{ type: String   },
+})
 // Define the model called Planet using planetSchema 
-
+const Planet = mongoose.model("Planet", planetSchema, "Planets")
 // Create a get route to / that renders home.ejs which renders all the planets into cards
 // e.g. /info/Mercury sends back Mercury's info page
-
+app.get("/", async (request, response)=>{
+  const planetCards = await Planet.find({})
+  response.render("home.ejs", { planetCards })
+})
 
 // Go into home.ejs and plug in the attributes
 
@@ -47,29 +54,29 @@ app.use(express.json());
 
 async function startServer() {
     // add your SRV string with a database called planets
-  
-    await mongoose.connect("...");
+    await mongoose.connect("mongodb+srv://SE12:CSH2025@akdoingse12.4hcgu.mongodb.net/?retryWrites=true&w=majority&appName=akdoingse12")
+
 
     // Uncomment the following code, and only run it once!
-    // const planets = [
-    //     {
-    //       name: "Mercury",
-    //       distance: 57900000,
-    //       diameter: 4879,
-    //       imagePath: "/Mercury.jpg",
-    //       description:
-    //         "The smallest planet in our solar system and closest to the Sun.",
-    //       orbital: 88,
-    //     },
-    //     {
-    //       name: "Venus",
-    //       distance: 108200000,
-    //       diameter: 12104,
-    //       imagePath: "/Venus.png",
-    //       description:
-    //         "A rocky planet known for its thick, toxic atmosphere and surface temperatures hot enough to melt lead.",
-    //       orbital: 225,
-    //     },
+     const planets = [
+         {
+           name: "Mercury",
+           distance: 57900000,
+           diameter: 4879,
+           imagePath: "/Mercury.jpg",
+           description:
+             "The smallest planet in our solar system and closest to the Sun.",
+           orbital: 88,
+         },
+         {
+         name: "Venus",
+           distance: 108200000,
+           diameter: 12104,
+         imagePath: "/Venus.png",
+         description:
+           "A rocky planet known for its thick, toxic atmosphere and surface temperatures hot enough to melt lead.",
+           orbital: 225,
+         }]
     //     {
     //       name: "Earth",
     //       distance: 149600000,
@@ -126,7 +133,7 @@ async function startServer() {
     //     },
     //   ];
   
-    //   const result = await Planet.insertMany(planets);
+  //     const result = await Planet.insertMany(planets);
   
     app.listen(3000, () => {
       console.log("Server is running");
